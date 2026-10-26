@@ -1,4 +1,4 @@
-__pycache__/
+﻿__pycache__/
 *.py[cod]
 *.class
 powermaster.log
@@ -17,4 +17,4 @@ archive/
 *.exe
 config.json
 *.tmp
-distributiv/
+distributiv/*.exe

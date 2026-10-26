@@ -1,6 +1,6 @@
 ﻿# PowerMaster ASUS TUF ⚡🛡️ (v0.2.59-beta)
 
-[![Version](https://img.shields.io/badge/version-0.2.59--beta-blue.svg)](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases)
+[![Version](https://img.shields.io/badge/version-0.2.59--beta-blue.svg)](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011%20(64--bit)-brightgreen.svg)]()
 [![Hardware](https://img.shields.io/badge/hardware-ASUS%20TUF%20%2F%20ROG-orange.svg)]()
 [![Tests](https://img.shields.io/badge/tests-165%2F165%20PASSED%20(100%25)-success.svg)]()
@@ -83,6 +83,7 @@
 
 ```text
 PowerMaster_ASUS/
+├── distributiv/            # Готовые пакеты установки и инструкции (папка со ссылками на релизы)
 ├── main.py                 # Главная точка входа (CLI, Mutex защита, системная маршрутизация)
 ├── tray_app.py             # Приложение в системном трее (pystray + контекстное меню Tkinter)
 ├── dashboard.py            # Интерактивный киберпанк-дашборд с живой телеметрией
@@ -121,12 +122,12 @@ PowerMaster_ASUS/
 ### 💻 Установка и использование
 
 #### Вариант А: Готовый инсталлятор (Рекомендуется)
-1. Откройте папку [`distributiv/`](distributiv/) или скачайте `PowerMaster_ASUS_Setup.exe` из релизов.
+1. Скачайте **[PowerMaster_ASUS_Setup.exe](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases/latest/download/PowerMaster_ASUS_Setup.exe)** со страницы **[Официальных Релизов (Releases)](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases/latest)** (или откройте папку [`distributiv/`](distributiv/)).
 2. Запустите файл **`PowerMaster_ASUS_Setup.exe`**.
 3. Установка выполняется в профиль пользователя `%LOCALAPPDATA%\PowerMaster_ASUS` без необходимости прав администратора. Создаётся ярлык в меню «Пуск» и настраивается тихий автозапуск в трей.
 
 #### Вариант Б: Портативная версия (Portable)
-1. Запустите файл **`PowerMaster_ASUS_Portable.exe`** из папки [`distributiv/`](distributiv/).
+1. Скачайте **[PowerMaster_ASUS_Portable.exe](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases/latest/download/PowerMaster_ASUS_Portable.exe)** со страницы **[Официальных Релизов (Releases)](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases/latest)** (или откройте папку [`distributiv/`](distributiv/)).
 2. Программа работает сразу без установки из любой папки или с флешки.
 
 #### Запуск с правами Администратора без постоянных окон UAC
@@ -219,6 +220,19 @@ Motherboard fan curves sync automatically with the active power plan via ASUS AC
 - **Windows DPAPI:** encrypts secrets and credentials with user-bound Win32 CryptoAPI.
 - **Secure Auto-Update:** cryptographic SHA-256 validation of downloaded setup binaries.
 - **Atomic Config Storage:** `NamedTemporaryFile` + `fsync` + `os.replace` eliminates config corruption during sudden power losses.
+
+---
+
+### 💻 Installation & Getting Started
+
+#### Option A: Windows Installer (Recommended)
+1. Download **[PowerMaster_ASUS_Setup.exe](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases/latest/download/PowerMaster_ASUS_Setup.exe)** from the **[Official Latest Releases](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases/latest)** page (or open the [`distributiv/`](distributiv/) directory).
+2. Launch **`PowerMaster_ASUS_Setup.exe`**.
+3. Installs cleanly into `%LOCALAPPDATA%\PowerMaster_ASUS` without requiring admin rights. Creates a Start Menu shortcut and configures silent tray autostart.
+
+#### Option B: Standalone Portable Executable
+1. Download **[PowerMaster_ASUS_Portable.exe](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases/latest/download/PowerMaster_ASUS_Portable.exe)** from the **[Official Latest Releases](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases/latest)** page (or open the [`distributiv/`](distributiv/) directory).
+2. Runs directly without installation from any folder or USB flash drive.
 
 ---
 
