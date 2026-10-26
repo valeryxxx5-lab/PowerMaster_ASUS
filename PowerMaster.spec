@@ -1,0 +1,87 @@
+﻿# -*- mode: python ; coding: utf-8 -*-
+# PowerMaster.spec - PyInstaller Specification for PowerMaster_ASUS (ТЗ-26, Рекомендация 2.4)
+# Build Standalone Windows Tray Application (--noconsole, all hidden imports included)
+
+block_cipher = None
+
+a = Analysis(
+    ['main.py'],
+    pathex=[],
+    binaries=[],
+    datas=[
+        ('config.json', '.'),
+    ],
+    hiddenimports=[
+        'pystray',
+        'pystray._win32',
+        'PIL',
+        'PIL._imaging',
+        'win32gui',
+        'win32con',
+        'win32api',
+        'win32service',
+        'win32serviceutil',
+        'win32crypt',
+        'pythoncom',
+        'win32com',
+        'win32com.client',
+        'win32pdh',
+        'psutil',
+        'ctypes',
+        'ctypes.wintypes',
+        'tkinter',
+        'tkinter.ttk',
+        'tkinter.filedialog',
+        'tkinter.messagebox',
+        'settings_dialog',
+        'asus_services',
+        'tray_enhancements',
+        'updater',
+        'update_dialog',
+        'icon_generator',
+        'urllib.request',
+        'urllib.error',
+        'dashboard',
+        'asus_thermal',
+        'windows_energy_saver',
+        'asus_battery',
+        'power_watcher',
+        'power_plan',
+        'config',
+        'autostart',
+    ],
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=['matplotlib', 'numpy', 'scipy', 'pandas'],
+    win_no_prefer_redirects=False,
+    win_private_assemblies=False,
+    cipher=block_cipher,
+    noarchive=False,
+)
+
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    [],
+    name='PowerMaster_ASUS',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=False,
+    upx_exclude=[],
+    runtime_tmpdir=None,
+    console=False, # --noconsole: запуск в фоне без окна консоли cmd
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon=None,
+    version='version_info.txt',
+)
