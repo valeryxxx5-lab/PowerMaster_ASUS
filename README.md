@@ -1,6 +1,6 @@
-﻿# PowerMaster ASUS TUF ⚡🛡️ (v0.2.59-beta)
+﻿# PowerMaster ASUS TUF ⚡🛡️ (v0.2.60-beta)
 
-[![Version](https://img.shields.io/badge/version-0.2.59--beta-blue.svg)](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases/latest)
+[![Version](https://img.shields.io/badge/version-0.2.60--beta-blue.svg)](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011%20(64--bit)-brightgreen.svg)]()
 [![Hardware](https://img.shields.io/badge/hardware-ASUS%20TUF%20%2F%20ROG-orange.svg)]()
 [![Tests](https://img.shields.io/badge/tests-165%2F165%20PASSED%20(100%25)-success.svg)]()
@@ -108,7 +108,7 @@ PowerMaster_ASUS/
 ├── test_updater_and_icons.py # Тесты безопасности апдейтера и генерации иконок
 ├── PowerMaster.spec        # PyInstaller спецификация автономной сборки .exe
 ├── installer.iss           # Inno Setup скрипт компиляции инсталлятора
-├── version_info.txt        # Ресурсный файл версий PE-заголовка (0.2.59.0)
+├── version_info.txt        # Ресурсный файл версий PE-заголовка (0.2.60.0)
 ├── config.example.json     # Эталонный шаблон конфигурационного файла
 ├── build_exe.bat           # Скрипт сборки автономного exe через PyInstaller
 ├── build_installer.bat     # Скрипт сборки Windows-инсталлятора через Inno Setup

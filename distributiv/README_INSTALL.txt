@@ -1,5 +1,5 @@
 ﻿================================================================================
-          PowerMaster ASUS TUF (v0.2.59-beta) - USER GUIDE & INSTALLATION
+          PowerMaster ASUS TUF (v0.2.60-beta) - USER GUIDE & INSTALLATION
           РУКОВОДСТВО ПОЛЬЗОВАТЕЛЯ И ИНСТРУКЦИЯ ПО УСТАНОВКЕ
 ================================================================================
 
@@ -226,9 +226,9 @@ FAQ:
   automatically on every login.
 
 ================================================================================
-SHA-256 INTEGRITY CHECKSUMS (v0.2.59-beta):
+SHA-256 INTEGRITY CHECKSUMS (v0.2.60-beta):
 - PowerMaster_ASUS_Setup.exe:
-  8b7bdfee0f2be77e1c685e2390fed1eccec6f7a060945af03ab5ed4433d64f25
+  1dd0457c092a7ab722fe6af51309923dc25f421e11a955a7270fa5f75aba7b60
 - PowerMaster_ASUS_Portable.exe:
-  373bc5352069269d0e90800cddbb3822b49864414f36fbddf0566b3685e86af9
+  70c912ad41e0a9d5827fa7a85598f2afbee676e4f131d5f93ee93366e90577a7
 ================================================================================

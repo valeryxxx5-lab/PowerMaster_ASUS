@@ -276,5 +276,29 @@ class TestSettingsAndTrayTZ28(unittest.TestCase):
             self.assertTrue(res)
             mock_root.after_idle.assert_called_once()
 
+    def test_12_tray_initial_startup_alignment_rocket_icon(self):
+        from tray_app import PowerMasterTrayApp, IconGenerator
+        from config import GUID_BALANCED, GUID_HIGH_PERFORMANCE
+
+        mock_snap = MagicMock()
+        mock_snap.current_plan_guid = GUID_BALANCED
+        mock_snap.in_startup_boost = True
+
+        mock_watcher_inst = MagicMock()
+        mock_watcher_inst.take_snapshot.return_value = mock_snap
+        mock_watcher_inst.evaluate_desired_plan.return_value = (GUID_HIGH_PERFORMANCE, "Startup Boost")
+
+        with patch("tray_app.PowerPlanManager.get_active_plan", return_value=(GUID_BALANCED, "Balanced")), \
+             patch("tray_app.PowerPlanManager.set_active_plan", return_value=(True, "OK")) as mock_set, \
+             patch("tray_app.PowerWatcher", return_value=mock_watcher_inst), \
+             patch("tray_app.PowerWatcher.get_power_status", return_value=(True, 100)), \
+             patch("tray_app.AsusBatteryController.set_charge_limit_direct"):
+            app = PowerMasterTrayApp()
+            self.assertEqual(app._current_plan_guid, GUID_HIGH_PERFORMANCE)
+            mock_set.assert_called_with(GUID_HIGH_PERFORMANCE)
+
+            img = IconGenerator.create_icon_image(app._current_plan_guid, app._is_ac, style="style_d")
+            self.assertIsNotNone(img)
+
 if __name__ == "__main__":
     unittest.main()

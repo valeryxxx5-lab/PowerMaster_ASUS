@@ -158,10 +158,41 @@ class PowerMasterTrayApp:
         self._is_running = True
         self._watcher = PowerWatcher(on_plan_changed=self._on_plan_changed)
         self._icon: Optional[pystray.Icon] = None
-        self._current_plan_guid, _ = PowerPlanManager.get_active_plan()
+        self._current_plan_guid = GUID_BALANCED
+        try:
+            curr_guid, _ = PowerPlanManager.get_active_plan()
+            if curr_guid:
+                self._current_plan_guid = curr_guid
+        except Exception:
+            pass
         self._is_ac = True
+        try:
+            p_stat = PowerWatcher.get_power_status()
+            if isinstance(p_stat, (tuple, list)) and len(p_stat) >= 1:
+                self._is_ac = bool(p_stat[0])
+        except Exception:
+            pass
         self._has_available_update: bool = False
         self._latest_release_info: Optional[Any] = None
+
+        # Pre-evaluate target power plan according to FSM rules (startup boost / battery / games)
+        # BEFORE creating tray icon so initial icon matches desired state immediately without glitch
+        try:
+            snapshot = self._watcher.take_snapshot()
+            if snapshot:
+                desired_guid, reason = self._watcher.evaluate_desired_plan(snapshot)
+                curr_guid = getattr(snapshot, "current_plan_guid", self._current_plan_guid)
+                if desired_guid and curr_guid and str(curr_guid).lower() != str(desired_guid).lower():
+                    logger.info(f"Initial startup alignment: {reason} -> switching to {desired_guid}")
+                    ok, _ = PowerPlanManager.set_active_plan(desired_guid)
+                    if ok:
+                        self._watcher._last_applied_guid = desired_guid
+                        self._watcher._last_reason = reason
+                        self._current_plan_guid = desired_guid
+                elif desired_guid:
+                    self._current_plan_guid = str(desired_guid)
+        except Exception as ex:
+            logger.debug(f"Initial startup plan alignment skipped: {ex}")
 
         # Automatically enforce battery charge limit on startup (direct IOCTL works without elevation)
         try:
@@ -312,6 +343,7 @@ class PowerMasterTrayApp:
         if curr_guid:
             self._current_plan_guid = curr_guid
         is_ac, _ = PowerWatcher.get_power_status()
+        self._is_ac = is_ac
         try:
             new_img = IconGenerator.create_icon_image(
                 self._current_plan_guid,
@@ -1136,19 +1168,38 @@ class PowerMasterTrayApp:
     def run(self) -> None:
         """Starts the PowerWatcher and enters the pystray main loop."""
         logger.info(f"Starting {APP_TITLE} System Tray App...")
-        # Start background power watcher
-        self._watcher.start()
 
-        # Build initial icon
-        init_img = IconGenerator.create_icon_image(self._current_plan_guid, self._is_ac)
-        active_name = PLAN_NAMES.get((self._current_plan_guid or "").lower(), "Сбалансированная")
+        # Ensure latest active plan and power status are verified before building initial UI
+        try:
+            curr_guid, _ = PowerPlanManager.get_active_plan()
+            if curr_guid:
+                self._current_plan_guid = curr_guid
+            p_stat = PowerWatcher.get_power_status()
+            if isinstance(p_stat, (tuple, list)) and len(p_stat) >= 1:
+                self._is_ac = bool(p_stat[0])
+        except Exception as ex:
+            logger.debug(f"Tray run status check suppressed: {ex}")
+
+        # Build initial icon with configured icon style and verified power state
+        init_img = IconGenerator.create_icon_image(
+            self._current_plan_guid,
+            self._is_ac,
+            style=config.icon_style,
+            has_update=self._has_available_update,
+        )
+        active_name = PLAN_NAMES.get((self._current_plan_guid or "").lower(), "План")
+        mode_tag = " (Ручной)" if self._watcher.has_manual_override else ""
+        upd_tag = "\n⚡ Доступно обновление!" if self._has_available_update else ""
 
         self._icon = pystray.Icon(
             name=APP_NAME,
             icon=init_img,
-            title=f"{APP_TITLE}\nПлан: {active_name}",
+            title=f"{APP_TITLE}\nПлан: {active_name}{mode_tag}\nСеть: {'AC (220V)' if self._is_ac else 'Батарея'}{upd_tag}",
             menu=self.build_menu(),
         )
+
+        # Start background power watcher after initial icon alignment
+        self._watcher.start()
 
         def on_tray_ready(icon):
             logger.info("Pystray message loop active, forcing icon.visible = True")
