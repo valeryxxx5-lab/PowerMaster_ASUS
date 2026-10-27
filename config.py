@@ -13,7 +13,7 @@ from typing import Any, Dict, List, Optional
 
 APP_NAME = "PowerMaster_ASUS"
 APP_TITLE = "PowerMaster ASUS TUF"
-APP_VERSION = "0.2.60-beta"
+APP_VERSION = "0.2.61-beta"
 
 import sys
 import threading

@@ -1,4 +1,4 @@
-﻿# PowerMaster ASUS TUF ⚡🛡️ (v0.2.60-beta)
+﻿# PowerMaster ASUS TUF ⚡🛡️ (v0.2.61-beta)
 
 [![Version](https://img.shields.io/badge/version-0.2.60--beta-blue.svg)](https://github.com/valeryxxx5-lab/PowerMaster_ASUS/releases/latest)
 [![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011%20(64--bit)-brightgreen.svg)]()

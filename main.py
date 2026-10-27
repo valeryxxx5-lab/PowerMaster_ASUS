@@ -110,6 +110,117 @@ def print_status() -> None:
     print("=" * 60)
 
 
+SHUTDOWN_EVENT_NAME = r"Local\PowerMaster_ASUS_Shutdown_Event"
+
+
+def signal_shutdown_existing() -> bool:
+    """Signals any running PowerMaster instance to cleanly remove its tray icon and exit."""
+    try:
+        kernel32 = ctypes.windll.kernel32
+        kernel32.OpenEventW.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.LPCWSTR]
+        kernel32.OpenEventW.restype = wintypes.HANDLE
+        kernel32.SetEvent.argtypes = [wintypes.HANDLE]
+        kernel32.SetEvent.restype = wintypes.BOOL
+        kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+        kernel32.CloseHandle.restype = wintypes.BOOL
+
+        EVENT_MODIFY_STATE = 0x0002
+        h_event = kernel32.OpenEventW(EVENT_MODIFY_STATE, False, SHUTDOWN_EVENT_NAME)
+        if h_event:
+            kernel32.SetEvent(h_event)
+            kernel32.CloseHandle(h_event)
+            return True
+    except Exception as e:
+        logging.getLogger("PowerMaster").debug(f"Could not signal shutdown event: {e}")
+    return False
+
+
+def terminate_duplicate_instances() -> int:
+    """
+    Обнаруживает и завершает все ранее запущенные экземпляры PowerMaster,
+    обеспечивая чистый запуск новой версии (Single-Instance Takeover).
+    1. Сначала отправляет сигнал мягкого выхода (Shutdown Event), чтобы старый процесс
+       удалил иконку из трея и очистил %TEMP%\_MEIxxxxxx.
+    2. Затем принудительно завершает любые оставшиеся процессы (сначала дочерние Worker,
+       затем зависшие Bootloader), игнорируя текущий процесс и всех его предков.
+    """
+    import time
+    import psutil
+
+    log = logging.getLogger("PowerMaster")
+    my_pid = os.getpid()
+    protected_pids = {my_pid}
+    try:
+        curr_proc = psutil.Process(my_pid)
+        for parent in curr_proc.parents():
+            protected_pids.add(parent.pid)
+    except Exception:
+        try:
+            ppid = os.getppid()
+            if ppid:
+                protected_pids.add(ppid)
+        except Exception:
+            pass
+
+    target_names = {"powermaster_asus.exe", "powermaster_asus_portable.exe", "powermaster.exe"}
+
+    def _find_foreign_procs() -> list:
+        found = []
+        for proc in psutil.process_iter(["pid", "ppid", "name"]):
+            try:
+                p_pid = proc.info["pid"]
+                p_name = (proc.info["name"] or "").lower()
+                if p_pid in protected_pids:
+                    continue
+                if p_name in target_names:
+                    found.append(proc)
+            except (psutil.NoSuchProcess, psutil.AccessDenied):
+                continue
+        return found
+
+    foreign = _find_foreign_procs()
+    if not foreign:
+        return 0
+
+    # Шаг 1: Кооперативный сигнал завершения (убирает фантомную иконку из трея и обходит AccessDenied)
+    if signal_shutdown_existing():
+        log.info("Отправлен сигнал мягкого завершения старому экземпляру PowerMaster...")
+        for _ in range(8):
+            time.sleep(0.1)
+            foreign = _find_foreign_procs()
+            if not foreign:
+                log.info("Старый экземпляр корректно завершился самостоятельно.")
+                return 1
+
+    # Шаг 2: Принудительное завершение (сначала дочерние процессы Worker, чтобы Bootloader очистил _MEI)
+    foreign_pids = {p.pid for p in foreign}
+    workers = [p for p in foreign if p.info.get("ppid") in foreign_pids]
+    bootloaders = [p for p in foreign if p.info.get("ppid") not in foreign_pids]
+
+    terminated_count = 0
+    for group in (workers, bootloaders):
+        for proc in group:
+            try:
+                if not proc.is_running():
+                    continue
+                log.info(f"Обнаружен работающий дубликат PowerMaster (PID={proc.pid}). Завершение старого процесса...")
+                proc.terminate()
+                try:
+                    proc.wait(timeout=1.0)
+                except psutil.TimeoutExpired:
+                    proc.kill()
+                terminated_count += 1
+            except (psutil.NoSuchProcess, psutil.AccessDenied) as e:
+                log.debug(f"Could not terminate PID={getattr(proc, 'pid', '?')}: {e}")
+                continue
+        if group is workers and workers:
+            time.sleep(0.25)  # Даём родительскому Bootloader штатно удалить %TEMP%\_MEIxxxxxx
+
+    if terminated_count > 0:
+        time.sleep(0.2)
+    return terminated_count
+
+
 def signal_show_dashboard() -> bool:
     """Signals the running PowerMaster instance via Win32 event to open/lift Dashboard."""
     try:
@@ -267,11 +378,12 @@ def main():
     except Exception:
         pass
 
-    # 1. Check single instance mutex
-    # For shortcut GUI launches, don't wait 5s to fail mutex; check immediately (timeout_sec=0.0)
-    # For --tray background instances (e.g. restart/autostart), wait up to 5s for clean shutdown
-    mutex_timeout = 5.0 if args.tray else 0.0
-    mutex = acquire_single_instance_mutex(timeout_sec=mutex_timeout)
+    # 1. Terminate any foreign duplicate instances (Single-Instance Takeover)
+    terminate_duplicate_instances()
+
+    # 2. Check single instance mutex
+    # Retries up to 5s to allow an exiting old instance to cleanly release the mutex
+    mutex = acquire_single_instance_mutex(timeout_sec=5.0)
     if not mutex:
         if args.tray:
             logger.info("PowerMaster is already running in background. Exiting duplicate --tray instance.")

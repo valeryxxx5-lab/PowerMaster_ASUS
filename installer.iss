@@ -1,11 +1,11 @@
 [Setup]
 AppId={{5B6A8C2D-A45B-4C0E-921F-9A52B884C0F7}
 AppName=PowerMaster ASUS TUF
-AppVersion=0.2.60
-VersionInfoVersion=0.2.60.0
-VersionInfoTextVersion=0.2.60.0
-VersionInfoProductVersion=0.2.60.0
-VersionInfoProductTextVersion=0.2.60.0
+AppVersion=0.2.61
+VersionInfoVersion=0.2.61.0
+VersionInfoTextVersion=0.2.61.0
+VersionInfoProductVersion=0.2.61.0
+VersionInfoProductTextVersion=0.2.61.0
 AppPublisher=PowerMaster ASUS
 ; Устанавливается в %LOCALAPPDATA%\PowerMaster_ASUS — права администратора НЕ НУЖНЫ
 DefaultDirName={localappdata}\PowerMaster_ASUS

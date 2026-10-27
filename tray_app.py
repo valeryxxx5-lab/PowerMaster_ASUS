@@ -206,7 +206,7 @@ class PowerMasterTrayApp:
         self._prewarm_dashboard()
 
     def _start_ipc_listener(self) -> None:
-        """Listens for external activation events (e.g. shortcut clicked while running) to lift Dashboard."""
+        """Listens for external activation events (e.g. shortcut clicked while running) to lift Dashboard or quit."""
         def _ipc_loop():
             try:
                 import ctypes
@@ -236,9 +236,41 @@ class PowerMasterTrayApp:
             except Exception as e:
                 logger.debug(f"IPC listener thread exception: {e}")
 
+        def _ipc_shutdown_loop():
+            try:
+                import ctypes
+                from ctypes import wintypes
+                kernel32 = ctypes.windll.kernel32
+                kernel32.CreateEventW.argtypes = [wintypes.LPVOID, wintypes.BOOL, wintypes.BOOL, wintypes.LPCWSTR]
+                kernel32.CreateEventW.restype = wintypes.HANDLE
+                kernel32.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+                kernel32.WaitForSingleObject.restype = wintypes.DWORD
+                kernel32.CloseHandle.argtypes = [wintypes.HANDLE]
+                kernel32.CloseHandle.restype = wintypes.BOOL
+
+                h_shutdown = kernel32.CreateEventW(None, False, False, "Local\\PowerMaster_ASUS_Shutdown_Event")
+                if not h_shutdown:
+                    return
+                try:
+                    while getattr(self, "_is_running", True):
+                        res = kernel32.WaitForSingleObject(h_shutdown, 1000)
+                        if res == 0:  # WAIT_OBJECT_0
+                            logger.info("Shutdown event signaled via IPC. Cleanly terminating old instance...")
+                            try:
+                                self._quit_action()
+                            except Exception as ex:
+                                logger.error(f"Error executing clean shutdown on IPC event: {ex}")
+                            break
+                finally:
+                    kernel32.CloseHandle(h_shutdown)
+            except Exception as e:
+                logger.debug(f"IPC shutdown listener exception: {e}")
+
         import threading
-        t = threading.Thread(target=_ipc_loop, daemon=True, name="PowerMasterIPCShowDashboard")
-        t.start()
+        t1 = threading.Thread(target=_ipc_loop, daemon=True, name="PowerMasterIPCShowDashboard")
+        t1.start()
+        t2 = threading.Thread(target=_ipc_shutdown_loop, daemon=True, name="PowerMasterIPCShutdown")
+        t2.start()
 
     def _prewarm_dashboard(self) -> None:
         def _warm():
@@ -668,6 +700,11 @@ class PowerMasterTrayApp:
         if self._icon:
             self._icon.visible = False
             self._icon.stop()
+        if getattr(self, "_on_restart_release_mutex", None):
+            try:
+                self._on_restart_release_mutex()
+            except Exception:
+                pass
 
     def build_menu(self) -> Menu:
         """Builds the comprehensive tray context menu."""
