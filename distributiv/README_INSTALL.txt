@@ -228,7 +228,7 @@ FAQ:
 ================================================================================
 SHA-256 INTEGRITY CHECKSUMS (v0.2.60-beta):
 - PowerMaster_ASUS_Setup.exe:
-  1dd0457c092a7ab722fe6af51309923dc25f421e11a955a7270fa5f75aba7b60
+  da1ff1c6aa73b587b7bb25d20ea76f0174a08f91793d293a679909b127b367e1
 - PowerMaster_ASUS_Portable.exe:
-  70c912ad41e0a9d5827fa7a85598f2afbee676e4f131d5f93ee93366e90577a7
+  3ad69a66a7bc982314fa7938d2067149760d67756a9f587e23a7d716fbad37f0
 ================================================================================

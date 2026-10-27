@@ -333,5 +333,62 @@ class TestUpdaterAndIconsTZ29(unittest.TestCase):
             except Exception:
                 pass
 
+    def test_13_check_for_updates_strictly_prefers_setup_over_portable(self):
+        """
+        Тест 13: Гарантия выбора Inno Setup инсталлятора вместо автономного Portable exe.
+        Предотвращает падение автообновления при вызове с ключами /SILENT.
+        """
+        from updater import GitHubPrivateUpdater
+        from unittest.mock import patch, MagicMock
+        import json
+
+        updater = GitHubPrivateUpdater(current_version="0.2.0")
+        mock_releases = [{
+            "tag_name": "v0.3.0",
+            "body": "Release notes",
+            "assets": [
+                {"name": "PowerMaster_ASUS_Portable.exe", "id": 101, "size": 15000000},
+                {"name": "PowerMaster_ASUS_Setup.exe", "id": 102, "size": 12000000},
+                {"name": "README_INSTALL.txt", "id": 103, "size": 1000},
+            ]
+        }]
+
+        mock_resp = MagicMock()
+        mock_resp.status = 200
+        mock_resp.read.return_value = json.dumps(mock_releases).encode("utf-8")
+        mock_resp.__enter__.return_value = mock_resp
+
+        with patch("urllib.request.urlopen", return_value=mock_resp):
+            has_update, rel_info, msg = updater.check_for_updates()
+            self.assertTrue(has_update)
+            self.assertIsNotNone(rel_info)
+            self.assertEqual(rel_info.asset_id, 102)
+            self.assertEqual(rel_info.asset_name, "PowerMaster_ASUS_Setup.exe")
+
+    def test_14_extract_sha256_by_asset_name(self):
+        """
+        Тест 14: Точное сопоставление контрольной суммы SHA-256 по имени ассета в Markdown списке.
+        """
+        from updater import extract_sha256
+        setup_hash = "1111111111111111111111111111111111111111111111111111111111111111"
+        portable_hash = "2222222222222222222222222222222222222222222222222222222222222222"
+
+        body = (
+            "### 📦 Контрольные суммы (SHA-256):\n"
+            f"- **PowerMaster_ASUS_Setup.exe:** `{setup_hash}`\n"
+            f"- **PowerMaster_ASUS_Portable.exe:** `{portable_hash}`\n"
+        )
+
+        # Выбор для инсталлятора
+        self.assertEqual(
+            extract_sha256(body, asset_name="PowerMaster_ASUS_Setup.exe"),
+            setup_hash
+        )
+        # Выбор для портативной версии
+        self.assertEqual(
+            extract_sha256(body, asset_name="PowerMaster_ASUS_Portable.exe"),
+            portable_hash
+        )
+
 if __name__ == "__main__":
     unittest.main()

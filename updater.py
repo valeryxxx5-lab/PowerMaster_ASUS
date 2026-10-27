@@ -121,8 +121,23 @@ SHA256_PATTERN = re.compile(
 )
 
 
-def extract_sha256(body: str, asset_digest: Optional[str] = None) -> Optional[str]:
-    """Извлекает ожидаемый SHA-256 дайджест из текста релиза или поля digest GitHub API."""
+def extract_sha256(
+    body: str,
+    asset_digest: Optional[str] = None,
+    asset_name: Optional[str] = None,
+) -> Optional[str]:
+    """Извлекает ожидаемый SHA-256 дайджест из текста релиза (с привязкой к имени файла) или поля digest GitHub API."""
+    if body and asset_name:
+        # Поиск хэша конкретного файла, например:
+        # - **PowerMaster_ASUS_Setup.exe:** `1dd0457c...`
+        # - PowerMaster_ASUS_Setup.exe: 1dd0457c...
+        specific_pat = re.compile(rf"{re.escape(asset_name)}[^\na-fA-F0-9]*([a-fA-F0-9]{{64}})", re.IGNORECASE)
+        match = specific_pat.search(body)
+        if match:
+            cand = match.group(1).lower()
+            if len(cand) == 64 and all(c in "0123456789abcdef" for c in cand):
+                return cand
+
     if body:
         match = SHA256_PATTERN.search(body)
         if match:
@@ -209,12 +224,14 @@ class GitHubPrivateUpdater:
         clean_tag = tag_name.lstrip("vV")
         is_newer = compare_versions(self.current_version, clean_tag)
 
-        # Ищем файл инсталлятора в assets
+        # Ищем файл инсталлятора в assets:
+        # Для автоматического бесшовного обновления через тихий запуск Inno Setup (/SILENT)
+        # мы СТРОГО выбираем установочный пакет (Setup.exe), исключая автономные Portable-сборки.
         assets = data.get("assets", [])
         setup_asset = None
         for a in assets:
             aname = a.get("name", "").lower()
-            if aname.endswith(".exe") and ("setup" in aname or "powermaster" in aname):
+            if aname.endswith(".exe") and "setup" in aname and "portable" not in aname:
                 setup_asset = a
                 break
 
@@ -230,7 +247,11 @@ class GitHubPrivateUpdater:
         if asset_id <= 0:
             return False, None, f"Некорректный идентификатор ассета инсталлятора (asset_id={raw_asset_id})"
 
-        expected_sha = extract_sha256(data.get("body", ""), setup_asset.get("digest"))
+        expected_sha = extract_sha256(
+            data.get("body", ""),
+            setup_asset.get("digest"),
+            asset_name=setup_asset.get("name", ""),
+        )
 
         release_info = GitHubReleaseInfo(
             tag_name=tag_name,
