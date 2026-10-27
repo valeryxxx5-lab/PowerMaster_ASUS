@@ -34,9 +34,15 @@ Source: "dist\PowerMaster_ASUS.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "config.json"; DestDir: "{app}"; Flags: onlyifdoesntexist skipifsourcedoesntexist
 
 [Icons]
-Name: "{group}\PowerMaster ASUS TUF"; Filename: "{app}\PowerMaster_ASUS.exe"
-Name: "{autodesktop}\PowerMaster ASUS TUF"; Filename: "{app}\PowerMaster_ASUS.exe"; Tasks: desktopicon
+Name: "{group}\PowerMaster ASUS TUF"; Filename: "{app}\PowerMaster_ASUS.exe"; WorkingDir: "{app}"
+Name: "{autodesktop}\PowerMaster ASUS TUF"; Filename: "{app}\PowerMaster_ASUS.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 Name: "{group}\{cm:UninstallProgram,PowerMaster ASUS TUF}"; Filename: "{uninstallexe}"
+
+[UninstallDelete]
+; Полная очистка рабочей папки, логов и старых профилей
+Type: filesandordirs; Name: "{localappdata}\PowerMaster_ASUS"
+Type: filesandordirs; Name: "{userappdata}\PowerMaster_ASUS"
+Type: files; Name: "{localappdata}\Temp\PowerMaster_ASUS_Setup_*.exe"
 
 [Run]
 ; Запуск приложения после установки / обновления (включая тихий режим)
