@@ -1,5 +1,5 @@
 # PowerMaster ASUS TUF v0.2.60-beta - Checksums (SHA-256)
 # Generated automatically after build
 
-a4fc45f0f1f1c8b2fdaef2be80bacfea16a82b8cd9d3fbcf18e05a56609681d7 *PowerMaster_ASUS_Setup.exe
-d9bcaca23dc99826ac1134784caecb6b33d937daef495b45b65c93af14f197f3 *PowerMaster_ASUS_Portable.exe
+8a4ae3dc379f98461efe06757778aab3ac2c824c31b1f34c9f032f035e72b330 *PowerMaster_ASUS_Setup.exe
+163567b7aa04e2435c57003d212bdc6d4c2d82423387eb2d944bed0cdbeae5c1 *PowerMaster_ASUS_Portable.exe

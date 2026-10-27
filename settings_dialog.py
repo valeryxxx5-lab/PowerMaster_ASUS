@@ -165,11 +165,11 @@ class SettingsWindow:
 
         self.t = I18N[self.lang]
         self.root.title(self.t["title"])
-        self.root.geometry("640x560")
+        self.root.geometry("640x580")
         self.root.minsize(580, 520)
 
         # Центрирование окна
-        self._center_window(640, 560)
+        self._center_window(640, 580)
 
         self.root.protocol("WM_DELETE_WINDOW", self._on_close)
 
@@ -207,8 +207,23 @@ class SettingsWindow:
         self.root.destroy()
 
     def _build_ui(self):
+        # 1. Сначала закрепляем нижнюю панель кнопок на самом дне (side="bottom")
+        # Это гарантирует, что кнопки ВСЕГДА видны в любом разрешении, оконном режиме и масштабе
+        btn_frame = ttk.Frame(self.root)
+        btn_frame.pack(side="bottom", fill="x", padx=10, pady=(0, 10))
+
+        resume_auto_btn = ttk.Button(btn_frame, text=self.t.get("btn_resume_auto", "⚡ Возобновить авторежим"), command=self._resume_auto_mode)
+        resume_auto_btn.pack(side="left", padx=5)
+
+        save_btn = ttk.Button(btn_frame, text=self.t["btn_save"], command=self._on_save)
+        save_btn.pack(side="right", padx=5)
+
+        cancel_btn = ttk.Button(btn_frame, text=self.t["btn_cancel"], command=self._on_close)
+        cancel_btn.pack(side="right", padx=5)
+
+        # 2. Затем упаковываем notebook сверху во всё оставшееся пространство
         notebook = ttk.Notebook(self.root)
-        notebook.pack(fill="both", expand=True, padx=10, pady=10)
+        notebook.pack(side="top", fill="both", expand=True, padx=10, pady=(10, 5))
 
         # Вкладка 1: Игры
         tab_games = ttk.Frame(notebook)
@@ -224,19 +239,6 @@ class SettingsWindow:
         tab_system = ttk.Frame(notebook)
         notebook.add(tab_system, text=self.t["tab_system"])
         self._build_tab_system(tab_system)
-
-        # Нижняя панель кнопок
-        btn_frame = ttk.Frame(self.root)
-        btn_frame.pack(fill="x", padx=10, pady=10)
-
-        resume_auto_btn = ttk.Button(btn_frame, text=self.t.get("btn_resume_auto", "⚡ Возобновить авторежим"), command=self._resume_auto_mode)
-        resume_auto_btn.pack(side="left", padx=5)
-
-        save_btn = ttk.Button(btn_frame, text=self.t["btn_save"], command=self._on_save)
-        save_btn.pack(side="right", padx=5)
-
-        cancel_btn = ttk.Button(btn_frame, text=self.t["btn_cancel"], command=self._on_close)
-        cancel_btn.pack(side="right", padx=5)
 
     def _build_tab_games(self, parent):
         # Каталоги
@@ -306,30 +308,41 @@ class SettingsWindow:
         ttk.Radiobutton(scale_frame, text=self.t["ui_scale_125"], variable=self.ui_scale_var, value=1.25).pack(side="left", padx=5)
         ttk.Radiobutton(scale_frame, text=self.t["ui_scale_150"], variable=self.ui_scale_var, value=1.5).pack(side="left", padx=5)
 
-        # Стиль иконки трея
+        # Стиль иконки трея и предпросмотр (в две колонки: радиокнопки слева, предпросмотр справа)
         lbl_style = ttk.Label(parent, text=self.t["icon_style"], font=("Segoe UI", 9, "bold"))
-        lbl_style.pack(anchor="w", padx=15, pady=(12, 6))
+        lbl_style.pack(anchor="w", padx=15, pady=(10, 4))
 
-        r0 = ttk.Radiobutton(parent, text=self.t.get("icon_style_tile", "🔲 Огромная (Сплошная плитка)"), variable=self.icon_style_var, value="style_tile")
-        r0.pack(anchor="w", padx=25, pady=3)
+        style_container = ttk.Frame(parent)
+        style_container.pack(fill="x", padx=20, pady=2)
 
-        r4 = ttk.Radiobutton(parent, text=self.t.get("icon_style_d", "🚀 Увеличенный силуэт (Скорость)"), variable=self.icon_style_var, value="style_d")
-        r4.pack(anchor="w", padx=25, pady=5)
+        # Левая колонка: радиокнопки
+        left_col = ttk.Frame(style_container)
+        left_col.pack(side="left", fill="y", anchor="n")
 
-        r1 = ttk.Radiobutton(parent, text=self.t["icon_style_a"], variable=self.icon_style_var, value="style_a")
-        r1.pack(anchor="w", padx=25, pady=5)
+        r0 = ttk.Radiobutton(left_col, text=self.t.get("icon_style_tile", "🔲 Огромная (Сплошная плитка - стиль Antigravity)"), variable=self.icon_style_var, value="style_tile")
+        r0.pack(anchor="w", pady=2)
 
-        r2 = ttk.Radiobutton(parent, text=self.t["icon_style_b"], variable=self.icon_style_var, value="style_b")
-        r2.pack(anchor="w", padx=25, pady=5)
+        r4 = ttk.Radiobutton(left_col, text=self.t.get("icon_style_d", "🚀 Увеличенный силуэт (Скорость: Ракета / Авто / Вело)"), variable=self.icon_style_var, value="style_d")
+        r4.pack(anchor="w", pady=2)
 
-        r3 = ttk.Radiobutton(parent, text=self.t["icon_style_c"], variable=self.icon_style_var, value="style_c")
-        r3.pack(anchor="w", padx=25, pady=5)
+        r1 = ttk.Radiobutton(left_col, text=self.t["icon_style_a"], variable=self.icon_style_var, value="style_a")
+        r1.pack(anchor="w", pady=2)
 
-        lbl_prev = ttk.Label(parent, text=self.t["preview"], font=("Segoe UI", 9, "italic"))
-        lbl_prev.pack(anchor="w", padx=15, pady=(20, 5))
+        r2 = ttk.Radiobutton(left_col, text=self.t["icon_style_b"], variable=self.icon_style_var, value="style_b")
+        r2.pack(anchor="w", pady=2)
 
-        self.preview_canvas = tk.Canvas(parent, width=128, height=128, bg="#1e1e1e", highlightthickness=1)
-        self.preview_canvas.pack(anchor="w", padx=25, pady=5)
+        r3 = ttk.Radiobutton(left_col, text=self.t["icon_style_c"], variable=self.icon_style_var, value="style_c")
+        r3.pack(anchor="w", pady=2)
+
+        # Правая колонка: предпросмотр
+        right_col = ttk.Frame(style_container)
+        right_col.pack(side="left", padx=(35, 0), anchor="n")
+
+        lbl_prev = ttk.Label(right_col, text=self.t["preview"], font=("Segoe UI", 9, "italic"))
+        lbl_prev.pack(anchor="w", pady=(0, 4))
+
+        self.preview_canvas = tk.Canvas(right_col, width=128, height=128, bg="#1e1e1e", highlightthickness=1)
+        self.preview_canvas.pack(anchor="w")
         self._draw_icon_preview()
         self.icon_style_var.trace_add("write", lambda *args: self._draw_icon_preview())
 
