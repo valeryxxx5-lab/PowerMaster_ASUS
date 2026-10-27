@@ -1,4 +1,4 @@
-﻿[Setup]
+[Setup]
 AppId={{5B6A8C2D-A45B-4C0E-921F-9A52B884C0F7}
 AppName=PowerMaster ASUS TUF
 AppVersion=0.2.60
@@ -26,6 +26,7 @@ ShowLanguageDialog=no
 Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 
 [Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 Name: "autostart"; Description: "Добавить в автозапуск (запуск при входе в систему)"; GroupDescription: "Автозапуск"
 
 [Files]
@@ -34,6 +35,7 @@ Source: "config.json"; DestDir: "{app}"; Flags: onlyifdoesntexist skipifsourcedo
 
 [Icons]
 Name: "{group}\PowerMaster ASUS TUF"; Filename: "{app}\PowerMaster_ASUS.exe"
+Name: "{autodesktop}\PowerMaster ASUS TUF"; Filename: "{app}\PowerMaster_ASUS.exe"; Tasks: desktopicon
 Name: "{group}\{cm:UninstallProgram,PowerMaster ASUS TUF}"; Filename: "{uninstallexe}"
 
 [Run]
