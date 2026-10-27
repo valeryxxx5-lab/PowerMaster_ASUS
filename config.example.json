@@ -1,32 +1,28 @@
-﻿{
-    "battery_charge_limit":  60,
-    "startup_boost_seconds":  180,
-    "idle_timeout_seconds":  180,
-    "poll_interval_seconds":  2.0,
-    "game_directories":  [
-                             "F:\\Games"
-                         ],
-    "game_process_names":  [
-
-                           ],
-    "auto_switching_enabled":  true,
-    "manual_override_guid":  null,
-    "minimize_to_tray":  true,
-    "start_with_windows":  false,
-    "notify_on_plan_change":  false,
-    "icon_style":  "style_d",
-    "language":  "ru",
-    "github_token":  "",
-    "check_updates_daily":  true,
-    "last_update_check":  0.0,
-    "ui_scale":  1.0,
-    "ui_theme":  "cyber_dark",
-    "asus_thermal_policy":  0,
-    "perfboostmode_disabled_in_saver":  true,
-    "windows_energy_saver_manual":  false,
-    "power_plans":  {
-                        "high_performance":  "07fa2daf-30e4-41ad-8daf-5bf18a330c48",
-                        "balanced":  "381b4222-f694-41f0-9685-ff5bb260df2e",
-                        "power_saver":  "d6c42cfd-bf64-4edf-85e4-9b82cd8789d8"
-                    }
+{
+    "battery_charge_limit": 80,
+    "startup_boost_seconds": 180,
+    "idle_timeout_seconds": 180,
+    "poll_interval_seconds": 2.0,
+    "game_directories": [],
+    "game_process_names": [],
+    "auto_switching_enabled": true,
+    "manual_override_guid": null,
+    "minimize_to_tray": true,
+    "start_with_windows": false,
+    "notify_on_plan_change": false,
+    "icon_style": "style_d",
+    "language": "ru",
+    "github_token": "",
+    "check_updates_daily": true,
+    "last_update_check": 0.0,
+    "ui_scale": 1.0,
+    "ui_theme": "cyber_dark",
+    "asus_thermal_policy": 0,
+    "perfboostmode_disabled_in_saver": true,
+    "windows_energy_saver_manual": false,
+    "power_plans": {
+        "high_performance": "07fa2daf-30e4-41ad-8daf-5bf18a330c48",
+        "balanced": "381b4222-f694-41f0-9685-ff5bb260df2e",
+        "power_saver": "d6c42cfd-bf64-4edf-85e4-9b82cd8789d8"
+    }
 }

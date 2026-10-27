@@ -100,9 +100,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "startup_boost_seconds": 180,
     "idle_timeout_seconds": 180,
     "poll_interval_seconds": 2.0,
-    "game_directories": [
-        "F:\\Games",
-    ],
+    "game_directories": [],
     "game_process_names": [],
     "auto_switching_enabled": True,
     "manual_override_guid": None,

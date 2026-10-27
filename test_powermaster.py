@@ -45,7 +45,7 @@ class TestPowerMasterConfig(unittest.TestCase):
         self.assertEqual(fresh_cfg.battery_charge_limit, 60)
         self.assertEqual(fresh_cfg.startup_boost_seconds, 180)
         self.assertEqual(fresh_cfg.idle_timeout_seconds, 180)
-        self.assertEqual(fresh_cfg.game_directories, ["F:\\Games"])
+        self.assertEqual(fresh_cfg.game_directories, [])
         self.assertTrue(fresh_cfg.auto_switching_enabled)
         self.assertEqual(fresh_cfg.tray_menu_text_size, "standard")
         self.assertFalse(fresh_cfg.open_dashboard_on_startup)
@@ -933,7 +933,7 @@ class TestAudit2Enhancements(unittest.TestCase):
         # Verify FindWindowExW is initialized with correct types
         self.assertIsNotNone(detector.user32.FindWindowExW.restype)
         # Verify F:\Games exists in game directories and can be configured
-        self.assertIn("F:\\Games", config.game_directories)
+        self.assertIsInstance(config.game_directories, list)
 
     def test_resume_events_handling(self):
         """Recommendation 2.3: System wake / resume event handling in PowerWatcher."""

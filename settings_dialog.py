@@ -174,7 +174,7 @@ class SettingsWindow:
         self.root.protocol("WM_DELETE_WINDOW", self._on_close)
 
         # Модели данных
-        self.game_dirs_list = list(self.config_obj.get("game_directories", ["F:\\Games", "D:\\Games"]))
+        self.game_dirs_list = list(self.config_obj.get("game_directories", []) or [])
         self.game_procs_list = list(self.config_obj.get("game_process_names", []))
         self.icon_style_var = tk.StringVar(master=self.root, value=str(self.config_obj.get("icon_style", "style_tile")))
         self.ui_scale_var = tk.DoubleVar(master=self.root, value=float(self.config_obj.get("ui_scale", 1.0)))
