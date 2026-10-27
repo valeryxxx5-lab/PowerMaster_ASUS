@@ -67,6 +67,7 @@ def acquire_single_instance_mutex(
     Retries up to timeout_sec to allow an exiting or restarting instance to cleanly close.
     Returns the mutex handle if this is the active instance, or None if already running.
     """
+    import random
     import time
     kernel32 = ctypes.windll.kernel32
     start = time.time()
@@ -76,13 +77,13 @@ def acquire_single_instance_mutex(
         if not handle:
             # Handle is NULL (e.g. ERROR_ACCESS_DENIED when created by elevated process)
             if timeout_sec > 0.0 and time.time() - start < timeout_sec:
-                time.sleep(0.2)
+                time.sleep(random.uniform(0.05, 0.25))
                 continue
             return None
         if last_error == ERROR_ALREADY_EXISTS:
             kernel32.CloseHandle(handle)
             if timeout_sec > 0.0 and time.time() - start < timeout_sec:
-                time.sleep(0.2)
+                time.sleep(random.uniform(0.05, 0.25))
                 continue
             return None
         return handle

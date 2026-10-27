@@ -147,7 +147,8 @@ class TestUpdaterAndIconsTZ29(unittest.TestCase):
             self.assertEqual(img.size, (64, 64))
             self.assertEqual(img.mode, "RGBA")
             # Подсчет непрозрачных пикселей (должно быть >= 85% площади 64x64)
-            non_trans = sum(1 for p in img.getdata() if p[3] > 0)
+            get_data = getattr(img, "get_flattened_data", img.getdata)
+            non_trans = sum(1 for p in get_data() if p[3] > 0)
             coverage = non_trans / (64 * 64)
             self.assertGreater(coverage, 0.85, f"Tile icon for {plan} must fill at least 85% of area, got {coverage*100:.1f}%")
 

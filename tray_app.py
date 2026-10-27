@@ -260,6 +260,8 @@ class PowerMasterTrayApp:
                                 self._quit_action()
                             except Exception as ex:
                                 logger.error(f"Error executing clean shutdown on IPC event: {ex}")
+                            import time
+                            time.sleep(0.1)  # Allow Windows Explorer message loop to finish Shell_NotifyIcon NIM_DELETE
                             break
                 finally:
                     kernel32.CloseHandle(h_shutdown)
